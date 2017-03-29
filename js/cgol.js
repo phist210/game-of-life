@@ -1,48 +1,50 @@
-function cell_clicked(e) {
+let x = 10;
+let y = 10;
+
+function cellClicked(e) {
     var $src = $(e.target);
-    $src.toggleClass("clicked");
-    console.log($src);
-    let neighbors = getNeighbors(e.target);
-    let count = countNeighboringLives(neighbors);
-    console.log(count);
+    if($src.hasClass('clicked')){
+    $src.removeClass('clicked');
+  } else {
+    $src.addClass('clicked');
+  }
+  let y = e.target.parentNode.rowIndex;
+  let x = e.target.cellIndex;
 }
 
-function runGame() {
-    console.log("hi");
+function getCell(q, w) {
+    return $("#cell_" + q + "_" + w);
 }
 
-function getCell(x, y) {
-    return $("#cell_" + x + "_" + y);
-}
-
-function getNeighbors(currentCell) {
+function getNeighbors(q, w) {
     // x-1,y-1   x,y-1   x+1,y-1
     // x-1,y     x,y     x+1,y
     // x-1,y+1   x,y+1   x+1, y+1
-    let y = currentCell.parentNode.rowIndex;
-    let x = currentCell.cellIndex;
+    let y = w;
+    let x = q;
 
     let xe = x-1;
     let xw = x+1;
     let yn = y-1;
     let ys = y+1;
 
-    let ne = getCell(xe, yn);
-    let n  = getCell(x,  yn);
-    let nw = getCell(xw, yn);
-    let e  = getCell(xe,  y);
-    let w  = getCell(xw,  y);
-    let se = getCell(xe, ys);
-    let s  = getCell(x,  ys);
-    let sw = getCell(xw, ys);
+    let $ne = getCell(xe, yn);
+    let $n  = getCell(x,  yn);
+    let $nw = getCell(xw, yn);
+    let $e  = getCell(xe,  y);
+    let $w  = getCell(xw,  y);
+    let $se = getCell(xe, ys);
+    let $s  = getCell(x,  ys);
+    let $sw = getCell(xw, ys);
 
-    return [ne,n,nw,e,w,se,s,sw];
+    return [$ne,$n,$nw,$e,$w,$se,$s,$sw];
 }
 
-function countNeighboringLives(neighbors) {
+function countNeighboringLives(q, w) {
     let count = 0;
-    for (let i = 0; i < neighbors.length; i++) {
-        if(neighbors[i].hasClass('clicked')) {
+    let neighbors = getNeighbors(q, w);
+    for (let w = 0; w < neighbors.length; w++) {
+        if(neighbors[w].hasClass('clicked')) {
             count++;
         }
     }
@@ -51,19 +53,57 @@ function countNeighboringLives(neighbors) {
 
 function buildGameBoard(x, y) {
     let $board = $('<table>');
-    for (let i = 0; i < y; i++) {
+    for (let w = 0; w < y; w++) {
         let $row = $('<tr>');
 
         $board.append($row);
-        for(let j = 0; j < x; j++) {
+        for(let q = 0; q < x; q++) {
             let $cell = $('<td>');
 
             $row.append($cell);
-            $cell.attr('id', 'cell_' + j + '_' + i);
-            $cell.on('click', cell_clicked);
+            $cell.attr('id', 'cell_' + q + '_' + w);
+            $cell.on('click', cellClicked);
         }
     }
     $('#gameBoard').append($board);
 }
 
-buildGameBoard(10, 10)
+function checkCells(x, y){
+  for(var w = 0; w < y; w++){
+    for(var q = 0; q < x; q++){
+      let $cell = getCell(q, w);
+      let neighbors = countNeighboringLives(q, w);
+      if($cell.hasClass('clicked')){
+        if(neighbors < 2 || neighbors > 3){
+          $cell.addClass('dead_pending')
+        }
+      } else {
+        if(neighbors === 3){
+          $cell.addClass('live_pending')
+        }
+      }
+    }
+  }
+}
+
+function updateCells(x, y){
+  checkCells(x, y);
+  for(var w = 0; w < y; w++){
+    for(var q = 0; q < x; q++){
+      let $cell = getCell(q, w);
+      if($cell.hasClass('dead_pending')){
+        $cell.removeClass('clicked');
+        $cell.removeClass('dead_pending')
+      } if($cell.hasClass('live_pending')){
+        $cell.addClass('clicked');
+        $cell.removeClass('live_pending');
+      }
+    }
+  }
+}
+
+function runGame(x, y) {
+  setInterval(updateCells(x, y), 1000);
+}
+
+buildGameBoard(x, y);
