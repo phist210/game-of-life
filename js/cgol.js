@@ -1,5 +1,5 @@
-let x = 10;
-let y = 10;
+const x = 10;
+const y = 10;
 
 function cellClicked(e) {
     var $src = $(e.target);
@@ -86,7 +86,7 @@ function checkCells(x, y){
   }
 }
 
-function updateCells(x, y){
+function updateCells(){
   checkCells(x, y);
   for(var w = 0; w < y; w++){
     for(var q = 0; q < x; q++){
@@ -102,8 +102,9 @@ function updateCells(x, y){
   }
 }
 
+
 function runGame(x, y) {
-  setInterval(updateCells(x, y), 1000);
+  setInterval(updateCells, 500);
 }
 
 buildGameBoard(x, y);

@@ -1,3 +1,12 @@
+body{
+  font-family: sans-serif;
+  font-weight: 100;
+}
+
+.title{
+  transform: rotate(-90deg);
+}
+
 table{
     border: 1px solid #000000;
 }
@@ -13,4 +22,9 @@ tr, td{
 .clicked {
     background-color: #000000;
     cursor: auto;
+}
+
+.main-container{
+  display: flex;
+  justify-content: center;
 }
